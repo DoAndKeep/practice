@@ -13,18 +13,10 @@ import doandkeep.com.practice.ablum.vo.Album;
 
 public class SubAlbumViewModel extends ViewModel {
 
+    // TODO albumResult如何更恰当的初始化
+
     private AlbumRepository repository = new AlbumRepository();
-
-    private LiveData<PagedList<Album>> aaa = new MutableLiveData<>();
-
-    private MutableLiveData<Void> ff = new MutableLiveData<>();
-    private MutableLiveData<Listing<Album>> albumResult2 = new MutableLiveData<>();
-    private LiveData<Listing<Album>> albumResult = Transformations.map(ff, new Function<Void, Listing<Album>>() {
-        @Override
-        public Listing<Album> apply(Void input) {
-            return repository.albums();
-        }
-    });
+    private MutableLiveData<Listing<Album>> albumResult = new MutableLiveData<>();
 
     private LiveData<PagedList<Album>> albums = Transformations.switchMap(albumResult,
             new Function<Listing<Album>, LiveData<PagedList<Album>>>() {
@@ -48,10 +40,8 @@ public class SubAlbumViewModel extends ViewModel {
                 }
             });
 
-    public void showSubAlbum() {
-        ff.setValue(null);
-//        aaa = repository.albums2();
-//        albumResult.setValue(repository.albums());
+    public SubAlbumViewModel() {
+        albumResult.setValue(repository.albums());
     }
 
     public void refresh() {
@@ -64,10 +54,6 @@ public class SubAlbumViewModel extends ViewModel {
         if (albumResult.getValue() != null && albumResult.getValue().getRetryCallback() != null) {
             albumResult.getValue().getRetryCallback().retry();
         }
-    }
-
-    public LiveData<PagedList<Album>> getAaa() {
-        return aaa;
     }
 
     public LiveData<PagedList<Album>> getAlbums() {

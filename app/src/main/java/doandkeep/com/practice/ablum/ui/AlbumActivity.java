@@ -33,7 +33,6 @@ public class AlbumActivity extends AppCompatActivity {
         model = ViewModelProviders.of(this).get(SubAlbumViewModel.class);
         initAdapter();
         initSwipeToRefresh();
-        model.showSubAlbum();
     }
 
     private void initAdapter() {
@@ -46,12 +45,6 @@ public class AlbumActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerView.setAdapter(adapter);
         model.getAlbums().observe(this, new Observer<PagedList<Album>>() {
-            @Override
-            public void onChanged(@Nullable PagedList<Album> albums) {
-                adapter.submitList(albums);
-            }
-        });
-        model.getAaa().observe(this, new Observer<PagedList<Album>>() {
             @Override
             public void onChanged(@Nullable PagedList<Album> albums) {
                 adapter.submitList(albums);

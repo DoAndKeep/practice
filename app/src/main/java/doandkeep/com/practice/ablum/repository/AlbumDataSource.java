@@ -8,7 +8,6 @@ import androidx.paging.ItemKeyedDataSource;
 import doandkeep.com.practice.ablum.vo.Album;
 import doandkeep.com.practice.ablum.vo.AlbumResult;
 import doandkeep.com.practice.network.BaseRequest;
-import doandkeep.com.practice.network.ICallback;
 import doandkeep.com.practice.network.NetworkHelper;
 import doandkeep.com.practice.network.Response;
 
@@ -29,30 +28,31 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, Album> {
         initialLoad.postValue(new NetworkState(Status.RUNNING));
 
         // TODO 使用正确的请求
-        BaseRequest<AlbumResult> request = new BaseRequest<>(AlbumResult.class, url, new ICallback<AlbumResult>() {
-            @Override
-            public void onSuccess(Response<AlbumResult> response) {
-                Log.e("zzz:", "loadInitial_onSuccess");
-                networkState.postValue(new NetworkState(Status.SUCCESS));
-                initialLoad.postValue(new NetworkState(Status.SUCCESS));
-                callback.onResult(response.getEntity().items);
-                retryCallback = null;
-            }
-
-            @Override
-            public void onFail(int code, Throwable e) {
-                Log.e("zzz:", "loadInitial_onFail,code:" + code);
-                e.printStackTrace();
-                retryCallback = new RetryCallback() {
-                    @Override
-                    public void retry() {
-                        loadInitial(params, callback);
-                    }
-                };
-                networkState.postValue(new NetworkState(Status.FAILED, "error:" + code));
-                initialLoad.postValue(new NetworkState(Status.FAILED, "error:" + code));
-            }
-        });
+        BaseRequest<AlbumResult> request = new BaseRequest<>(AlbumResult.class, url, null);
+//        new ICallback<AlbumResult>() {
+//            @Override
+//            public void onSuccess(Response<AlbumResult> response) {
+//                Log.e("zzz:", "loadInitial_onSuccess");
+//                networkState.postValue(new NetworkState(Status.SUCCESS));
+//                initialLoad.postValue(new NetworkState(Status.SUCCESS));
+//                callback.onResult(response.getEntity().items);
+//                retryCallback = null;
+//            }
+//
+//            @Override
+//            public void onFail(int code, Throwable e) {
+//                Log.e("zzz:", "loadInitial_onFail,code:" + code);
+//                e.printStackTrace();
+//                retryCallback = new RetryCallback() {
+//                    @Override
+//                    public void retry() {
+//                        loadInitial(params, callback);
+//                    }
+//                };
+//                networkState.postValue(new NetworkState(Status.FAILED, "error:" + code));
+//                initialLoad.postValue(new NetworkState(Status.FAILED, "error:" + code));
+//            }
+//        }
         try {
             Response<AlbumResult> r = NetworkHelper.getInstance().syncGet(request);
             networkState.postValue(new NetworkState(Status.SUCCESS));
@@ -68,24 +68,25 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, Album> {
     public void loadAfter(@NonNull final LoadParams<Long> params, @NonNull final LoadCallback<Album> callback) {
         networkState.postValue(new NetworkState(Status.RUNNING));
 
-        BaseRequest<AlbumResult> request = new BaseRequest<>(AlbumResult.class, url, new ICallback<AlbumResult>() {
-            @Override
-            public void onSuccess(Response<AlbumResult> response) {
-                networkState.postValue(new NetworkState(Status.SUCCESS));
-                callback.onResult(response.getEntity().items);
-            }
-
-            @Override
-            public void onFail(int code, Throwable e) {
-                retryCallback = new RetryCallback() {
-                    @Override
-                    public void retry() {
-                        loadAfter(params, callback);
-                    }
-                };
-                networkState.postValue(new NetworkState(Status.FAILED, "error:" + code));
-            }
-        });
+        BaseRequest<AlbumResult> request = new BaseRequest<>(AlbumResult.class, url, null);
+//        new ICallback<AlbumResult>() {
+//            @Override
+//            public void onSuccess(Response<AlbumResult> response) {
+//                networkState.postValue(new NetworkState(Status.SUCCESS));
+//                callback.onResult(response.getEntity().items);
+//            }
+//
+//            @Override
+//            public void onFail(int code, Throwable e) {
+//                retryCallback = new RetryCallback() {
+//                    @Override
+//                    public void retry() {
+//                        loadAfter(params, callback);
+//                    }
+//                };
+//                networkState.postValue(new NetworkState(Status.FAILED, "error:" + code));
+//            }
+//        }
         try {
             Response<AlbumResult> r = NetworkHelper.getInstance().syncGet(request);
             networkState.postValue(new NetworkState(Status.SUCCESS));
