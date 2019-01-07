@@ -13,6 +13,7 @@ import doandkeep.com.practice.ablum.repository.RetryCallback;
 import doandkeep.com.practice.ablum.repository.Status;
 import doandkeep.com.practice.ablum.vo.Album;
 import doandkeep.com.practice.ablum.vo.AlbumItem;
+import doandkeep.com.practice.ablum.vo.Section;
 
 import java.util.List;
 
@@ -45,7 +46,11 @@ public class AlbumAdapter extends PagedListAdapter<AlbumItem, RecyclerView.ViewH
         if (hasExtraRaw() && position == getItemCount() - 1) {
             return R.layout.network_state_item;
         } else {
-            return R.layout.album_picture_item;
+            if (getItem(position).isSection()) {
+                return R.layout.album_section_item;
+            } else {
+                return R.layout.album_picture_item;
+            }
         }
     }
 
@@ -65,9 +70,14 @@ public class AlbumAdapter extends PagedListAdapter<AlbumItem, RecyclerView.ViewH
                         .inflate(R.layout.album_picture_item, viewGroup, false);
                 viewHolder = new PictureViewHolder(pictureView);
                 break;
+            case R.layout.album_section_item:
+                View sectionView = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.album_section_item, viewGroup, false);
+                viewHolder = new SectionViewHolder(sectionView);
+                break;
             case R.layout.network_state_item:
                 View networkStateView = LayoutInflater.from(viewGroup.getContext())
-                        .inflate(R.layout.album_picture_item, viewGroup, false);
+                        .inflate(R.layout.network_state_item, viewGroup, false);
                 viewHolder = new NetworkStateViewHolder(networkStateView);
                 break;
             default:
@@ -85,6 +95,12 @@ public class AlbumAdapter extends PagedListAdapter<AlbumItem, RecyclerView.ViewH
                 if (viewHolder instanceof PictureViewHolder) {
                     PictureViewHolder pictureViewHolder = (PictureViewHolder) viewHolder;
                     pictureViewHolder.bind((Album) getItem(position));
+                }
+                break;
+            case R.layout.album_section_item:
+                if (viewHolder instanceof SectionViewHolder) {
+                    SectionViewHolder sectionViewHolder = (SectionViewHolder) viewHolder;
+                    sectionViewHolder.bind((Section) getItem(position));
                 }
                 break;
             case R.layout.network_state_item:

@@ -8,6 +8,7 @@ import androidx.paging.ItemKeyedDataSource;
 import doandkeep.com.practice.ablum.vo.Album;
 import doandkeep.com.practice.ablum.vo.AlbumResult;
 import doandkeep.com.practice.ablum.vo.AlbumItem;
+import doandkeep.com.practice.ablum.vo.Section;
 import doandkeep.com.practice.network.BaseRequest;
 import doandkeep.com.practice.network.NetworkHelper;
 import doandkeep.com.practice.network.Response;
@@ -17,7 +18,8 @@ import java.util.List;
 
 public class AlbumDataSource extends ItemKeyedDataSource<Long, AlbumItem> {
 
-    private String url = "https://api.github.com/search/repositories?q=android&page=";
+    //    private String url = "https://api.github.com/search/repositories?q=android&sort=stars&order=desc&per_page=5";
+    private String url = "https://api.github.com/search/repositories?q=android&sort=stars&order=desc&page=";
 
     // TODO retryCallback的逻辑完善
     private RetryCallback retryCallback;
@@ -25,14 +27,17 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, AlbumItem> {
     private MutableLiveData<NetworkState> networkState = new MutableLiveData<>();
     private MutableLiveData<NetworkState> initialLoad = new MutableLiveData<>();
 
+    private long page = 1;
+
     @Override
     public void loadInitial(@NonNull final ItemKeyedDataSource.LoadInitialParams<Long> params, @NonNull final LoadInitialCallback<AlbumItem> callback) {
         Log.e("zzz", "loadInitial");
+        page = 1;
         networkState.postValue(new NetworkState(Status.RUNNING));
         initialLoad.postValue(new NetworkState(Status.RUNNING));
 
         // TODO 使用正确的请求
-        BaseRequest<AlbumResult> request = new BaseRequest<>(AlbumResult.class, url, null);
+        BaseRequest<AlbumResult> request = new BaseRequest<>(AlbumResult.class, url + page, null);
 //        new ICallback<AlbumResult>() {
 //            @Override
 //            public void onSuccess(Response<AlbumResult> response) {
@@ -61,10 +66,7 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, AlbumItem> {
             Response<AlbumResult> r = NetworkHelper.getInstance().syncGet(request);
             networkState.postValue(new NetworkState(Status.SUCCESS));
             initialLoad.postValue(new NetworkState(Status.SUCCESS));
-            List<AlbumItem> albumItemList = new ArrayList<>();
-            for (Album album : r.getEntity().items) {
-                albumItemList.add(album);
-            }
+            List<AlbumItem> albumItemList = convert(r.getEntity().items);
             callback.onResult(albumItemList);
             Log.e("zzz:", "loadInitial_callback");
         } catch (Exception e) {
@@ -75,9 +77,11 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, AlbumItem> {
     @Override
     public void loadAfter(@NonNull final LoadParams<Long> params, @NonNull final LoadCallback<AlbumItem> callback) {
         Log.e("zzz", "loadAfter");
+        page ++;
+        Log.e("zzz", "page:" + page);
         networkState.postValue(new NetworkState(Status.RUNNING));
 
-        BaseRequest<AlbumResult> request = new BaseRequest<>(AlbumResult.class, url, null);
+        BaseRequest<AlbumResult> request = new BaseRequest<>(AlbumResult.class, url + page, null);
 //        new ICallback<AlbumResult>() {
 //            @Override
 //            public void onSuccess(Response<AlbumResult> response) {
@@ -100,10 +104,7 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, AlbumItem> {
             Response<AlbumResult> r = NetworkHelper.getInstance().syncGet(request);
             networkState.postValue(new NetworkState(Status.SUCCESS));
             initialLoad.postValue(new NetworkState(Status.SUCCESS));
-            List<AlbumItem> albumItemList = new ArrayList<>();
-            for (Album album : r.getEntity().items) {
-                albumItemList.add(album);
-            }
+            List<AlbumItem> albumItemList = convert(r.getEntity().items);
             callback.onResult(albumItemList);
             Log.e("zzz:", "loadAfter_callback");
         } catch (Exception e) {
@@ -123,7 +124,7 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, AlbumItem> {
         // TODO 使用正确的Key
 //        Log.e("zzz:", "getKey,key:" + item.id);
 //        return item.id;
-        return 1l;
+        return page;
     }
 
     public LiveData<NetworkState> getNetworkState() {
@@ -147,4 +148,24 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, AlbumItem> {
             }).start();
         }
     }
+
+    private List<AlbumItem> convert(List<Album> originalAlbums) {
+
+        List<AlbumItem> albumItems = new ArrayList<>();
+
+        int lastStarPerK = -1;
+
+        for (int i = 0; i < originalAlbums.size(); i++) {
+            Album album = originalAlbums.get(i);
+            int starPerK = album.stargazers_count / 1000;
+            if (lastStarPerK != starPerK) {
+                lastStarPerK = starPerK;
+                albumItems.add(new Section("star:" + starPerK + "k"));
+            }
+            albumItems.add(album);
+        }
+
+        return albumItems;
+    }
+
 }

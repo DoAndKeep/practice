@@ -42,7 +42,18 @@ public class AlbumActivity extends AppCompatActivity {
                 model.retry();
             }
         });
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (adapter.getItemViewType(position) == R.layout.album_picture_item) {
+                    return 1;
+                }
+
+                return 3;
+            }
+        });
+        recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setAdapter(adapter);
         model.getAlbums().observe(this, new Observer<PagedList<AlbumItem>>() {
             @Override
@@ -62,7 +73,10 @@ public class AlbumActivity extends AppCompatActivity {
         model.getRefreshState().observe(this, new Observer<NetworkState>() {
             @Override
             public void onChanged(NetworkState networkState) {
-                swipeRefreshLayout.setRefreshing(networkState.getStatus() == Status.RUNNING);
+                if (networkState.getStatus() != Status.RUNNING) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+//                swipeRefreshLayout.setRefreshing(networkState.getStatus() == Status.RUNNING);
             }
         });
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

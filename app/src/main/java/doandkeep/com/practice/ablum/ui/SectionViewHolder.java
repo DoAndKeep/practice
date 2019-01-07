@@ -1,24 +1,20 @@
 package doandkeep.com.practice.ablum.ui;
 
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import doandkeep.com.practice.GlideApp;
 import doandkeep.com.practice.R;
-import doandkeep.com.practice.ablum.vo.Album;
+import doandkeep.com.practice.ablum.vo.Section;
 
-public class PictureViewHolder extends RecyclerView.ViewHolder {
+public class SectionViewHolder extends RecyclerView.ViewHolder {
 
     private TextView textView;
-    private ImageView imageView;
 
-    public PictureViewHolder(@NonNull View itemView) {
+    public SectionViewHolder(@NonNull View itemView) {
         super(itemView);
         textView = itemView.findViewById(R.id.name);
-        imageView = itemView.findViewById(R.id.picture);
         initListener();
     }
 
@@ -32,11 +28,8 @@ public class PictureViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
-    public void bind(Album album) {
-        GlideApp.with(imageView.getContext())
-                .load("https://www.baidu.com/img/superlogo_c4d7df0a003d3db9b65e9ef0fe6da1ec.png?qua=high&where=super")
-                .into(imageView);
-        textView.setText(album.stargazers_count + "");
+    public void bind(Section section) {
+        textView.setText(section.title);
     }
 
 }
