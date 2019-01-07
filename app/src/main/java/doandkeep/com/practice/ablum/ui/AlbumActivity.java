@@ -13,7 +13,7 @@ import doandkeep.com.practice.R;
 import doandkeep.com.practice.ablum.repository.NetworkState;
 import doandkeep.com.practice.ablum.repository.RetryCallback;
 import doandkeep.com.practice.ablum.repository.Status;
-import doandkeep.com.practice.ablum.vo.Album;
+import doandkeep.com.practice.ablum.vo.AlbumItem;
 
 public class AlbumActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -21,7 +21,7 @@ public class AlbumActivity extends AppCompatActivity {
 
     private AlbumAdapter adapter;
 
-    private SubAlbumViewModel model;
+    private AlbumViewModel model;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class AlbumActivity extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         recyclerView = findViewById(R.id.recycler_view);
 
-        model = ViewModelProviders.of(this).get(SubAlbumViewModel.class);
+        model = ViewModelProviders.of(this).get(AlbumViewModel.class);
         initAdapter();
         initSwipeToRefresh();
     }
@@ -44,9 +44,9 @@ public class AlbumActivity extends AppCompatActivity {
         });
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerView.setAdapter(adapter);
-        model.getAlbums().observe(this, new Observer<PagedList<Album>>() {
+        model.getAlbums().observe(this, new Observer<PagedList<AlbumItem>>() {
             @Override
-            public void onChanged(@Nullable PagedList<Album> albums) {
+            public void onChanged(@Nullable PagedList<AlbumItem> albums) {
                 adapter.submitList(albums);
             }
         });

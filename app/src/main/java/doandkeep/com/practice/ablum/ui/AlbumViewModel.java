@@ -9,38 +9,38 @@ import androidx.paging.PagedList;
 import doandkeep.com.practice.ablum.repository.AlbumRepository;
 import doandkeep.com.practice.ablum.repository.Listing;
 import doandkeep.com.practice.ablum.repository.NetworkState;
-import doandkeep.com.practice.ablum.vo.Album;
+import doandkeep.com.practice.ablum.vo.AlbumItem;
 
-public class SubAlbumViewModel extends ViewModel {
+public class AlbumViewModel extends ViewModel {
 
     // TODO albumResult如何更恰当的初始化
 
     private AlbumRepository repository = new AlbumRepository();
-    private MutableLiveData<Listing<Album>> albumResult = new MutableLiveData<>();
+    private MutableLiveData<Listing<AlbumItem>> albumResult = new MutableLiveData<>();
 
-    private LiveData<PagedList<Album>> albums = Transformations.switchMap(albumResult,
-            new Function<Listing<Album>, LiveData<PagedList<Album>>>() {
+    private LiveData<PagedList<AlbumItem>> albums = Transformations.switchMap(albumResult,
+            new Function<Listing<AlbumItem>, LiveData<PagedList<AlbumItem>>>() {
                 @Override
-                public LiveData<PagedList<Album>> apply(Listing<Album> input) {
+                public LiveData<PagedList<AlbumItem>> apply(Listing<AlbumItem> input) {
                     return input.getPagedList();
                 }
             });
     private LiveData<NetworkState> networkState = Transformations.switchMap(albumResult,
-            new Function<Listing<Album>, LiveData<NetworkState>>() {
+            new Function<Listing<AlbumItem>, LiveData<NetworkState>>() {
                 @Override
-                public LiveData<NetworkState> apply(Listing<Album> input) {
+                public LiveData<NetworkState> apply(Listing<AlbumItem> input) {
                     return input.getNetworkState();
                 }
             });
     private LiveData<NetworkState> refreshState = Transformations.switchMap(albumResult,
-            new Function<Listing<Album>, LiveData<NetworkState>>() {
+            new Function<Listing<AlbumItem>, LiveData<NetworkState>>() {
                 @Override
-                public LiveData<NetworkState> apply(Listing<Album> input) {
+                public LiveData<NetworkState> apply(Listing<AlbumItem> input) {
                     return input.getRefreshState();
                 }
             });
 
-    public SubAlbumViewModel() {
+    public AlbumViewModel() {
         albumResult.setValue(repository.albums());
     }
 
@@ -56,7 +56,7 @@ public class SubAlbumViewModel extends ViewModel {
         }
     }
 
-    public LiveData<PagedList<Album>> getAlbums() {
+    public LiveData<PagedList<AlbumItem>> getAlbums() {
         return albums;
     }
 

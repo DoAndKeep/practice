@@ -6,23 +6,27 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
-import doandkeep.com.practice.ablum.vo.Album;
+import doandkeep.com.practice.ablum.vo.AlbumItem;
 
 public class AlbumRepository {
 
-    public Listing<Album> albums() {
+    public Listing<AlbumItem> albums() {
         Log.e("zzz", "albums");
         final AlbumDataSourceFactory sourceFactory = new AlbumDataSourceFactory();
 
         PagedList.Config config = new PagedList.Config.Builder()
                 // TODO pagesize与接口中传递的关联关系
                 .setPageSize(10)
+//                .setPrefetchDistance(0)
+//                .setInitialLoadSizeHint(0)
                 .setEnablePlaceholders(false)
                 .build();
 
         // TODO builder的其他参数
-        LiveData<PagedList<Album>> albumList =
-                new LivePagedListBuilder<>(sourceFactory, config).build();
+        LiveData<PagedList<AlbumItem>> albumList =
+                new LivePagedListBuilder<>(sourceFactory, config)
+                        .setBoundaryCallback(new AlbumBoundaryCallback())
+                        .build();
 
         LiveData<NetworkState> networkState = Transformations.switchMap(sourceFactory.getSourceLiveData(),
                 new Function<AlbumDataSource, LiveData<NetworkState>>() {

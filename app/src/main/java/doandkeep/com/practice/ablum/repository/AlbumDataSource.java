@@ -7,11 +7,15 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.paging.ItemKeyedDataSource;
 import doandkeep.com.practice.ablum.vo.Album;
 import doandkeep.com.practice.ablum.vo.AlbumResult;
+import doandkeep.com.practice.ablum.vo.AlbumItem;
 import doandkeep.com.practice.network.BaseRequest;
 import doandkeep.com.practice.network.NetworkHelper;
 import doandkeep.com.practice.network.Response;
 
-public class AlbumDataSource extends ItemKeyedDataSource<Long, Album> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class AlbumDataSource extends ItemKeyedDataSource<Long, AlbumItem> {
 
     private String url = "https://api.github.com/search/repositories?q=android&page=";
 
@@ -22,8 +26,8 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, Album> {
     private MutableLiveData<NetworkState> initialLoad = new MutableLiveData<>();
 
     @Override
-    public void loadInitial(@NonNull final ItemKeyedDataSource.LoadInitialParams<Long> params, @NonNull final LoadInitialCallback<Album> callback) {
-        Log.e("zzz:", "loadInitial");
+    public void loadInitial(@NonNull final ItemKeyedDataSource.LoadInitialParams<Long> params, @NonNull final LoadInitialCallback<AlbumItem> callback) {
+        Log.e("zzz", "loadInitial");
         networkState.postValue(new NetworkState(Status.RUNNING));
         initialLoad.postValue(new NetworkState(Status.RUNNING));
 
@@ -57,7 +61,11 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, Album> {
             Response<AlbumResult> r = NetworkHelper.getInstance().syncGet(request);
             networkState.postValue(new NetworkState(Status.SUCCESS));
             initialLoad.postValue(new NetworkState(Status.SUCCESS));
-            callback.onResult(r.getEntity().items);
+            List<AlbumItem> albumItemList = new ArrayList<>();
+            for (Album album : r.getEntity().items) {
+                albumItemList.add(album);
+            }
+            callback.onResult(albumItemList);
             Log.e("zzz:", "loadInitial_callback");
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,7 +73,8 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, Album> {
     }
 
     @Override
-    public void loadAfter(@NonNull final LoadParams<Long> params, @NonNull final LoadCallback<Album> callback) {
+    public void loadAfter(@NonNull final LoadParams<Long> params, @NonNull final LoadCallback<AlbumItem> callback) {
+        Log.e("zzz", "loadAfter");
         networkState.postValue(new NetworkState(Status.RUNNING));
 
         BaseRequest<AlbumResult> request = new BaseRequest<>(AlbumResult.class, url, null);
@@ -91,7 +100,11 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, Album> {
             Response<AlbumResult> r = NetworkHelper.getInstance().syncGet(request);
             networkState.postValue(new NetworkState(Status.SUCCESS));
             initialLoad.postValue(new NetworkState(Status.SUCCESS));
-            callback.onResult(r.getEntity().items);
+            List<AlbumItem> albumItemList = new ArrayList<>();
+            for (Album album : r.getEntity().items) {
+                albumItemList.add(album);
+            }
+            callback.onResult(albumItemList);
             Log.e("zzz:", "loadAfter_callback");
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,16 +112,18 @@ public class AlbumDataSource extends ItemKeyedDataSource<Long, Album> {
     }
 
     @Override
-    public void loadBefore(@NonNull LoadParams<Long> params, @NonNull LoadCallback<Album> callback) {
+    public void loadBefore(@NonNull LoadParams<Long> params, @NonNull LoadCallback<AlbumItem> callback) {
         // ignored, since we only ever append to our initial load
+        Log.e("zzz", "loadBefore");
     }
 
     @NonNull
     @Override
-    public Long getKey(@NonNull Album item) {
+    public Long getKey(@NonNull AlbumItem item) {
         // TODO 使用正确的Key
-        Log.e("zzz:", "getKey,key:" + item.id);
-        return item.id;
+//        Log.e("zzz:", "getKey,key:" + item.id);
+//        return item.id;
+        return 1l;
     }
 
     public LiveData<NetworkState> getNetworkState() {

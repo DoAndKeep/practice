@@ -12,24 +12,25 @@ import doandkeep.com.practice.ablum.repository.NetworkState;
 import doandkeep.com.practice.ablum.repository.RetryCallback;
 import doandkeep.com.practice.ablum.repository.Status;
 import doandkeep.com.practice.ablum.vo.Album;
+import doandkeep.com.practice.ablum.vo.AlbumItem;
 
 import java.util.List;
 
-public class AlbumAdapter extends PagedListAdapter<Album, RecyclerView.ViewHolder> {
+public class AlbumAdapter extends PagedListAdapter<AlbumItem, RecyclerView.ViewHolder> {
 
     private RetryCallback retryCallback;
 
     private NetworkState networkState;
 
     // TODO 熟悉作用并优化Comparator
-    private static DiffUtil.ItemCallback<Album> ALBUM_COMPARATOR = new DiffUtil.ItemCallback<Album>() {
+    private static DiffUtil.ItemCallback<AlbumItem> ALBUM_COMPARATOR = new DiffUtil.ItemCallback<AlbumItem>() {
         @Override
-        public boolean areItemsTheSame(@NonNull Album album, @NonNull Album t1) {
+        public boolean areItemsTheSame(@NonNull AlbumItem album, @NonNull AlbumItem t1) {
             return false;
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull Album album, @NonNull Album t1) {
+        public boolean areContentsTheSame(@NonNull AlbumItem album, @NonNull AlbumItem t1) {
             return false;
         }
     };
@@ -83,7 +84,7 @@ public class AlbumAdapter extends PagedListAdapter<Album, RecyclerView.ViewHolde
             case R.layout.album_picture_item:
                 if (viewHolder instanceof PictureViewHolder) {
                     PictureViewHolder pictureViewHolder = (PictureViewHolder) viewHolder;
-                    pictureViewHolder.bind(getItem(position));
+                    pictureViewHolder.bind((Album) getItem(position));
                 }
                 break;
             case R.layout.network_state_item:
